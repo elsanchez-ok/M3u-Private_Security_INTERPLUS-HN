@@ -1,0 +1,24 @@
+# Proteger panel admin
+<FilesMatch "^admin\.html$">
+    AuthType Basic
+    AuthName "Admin Access"
+    AuthUserFile /ruta/a/.htpasswd
+    Require valid-user
+</FilesMatch>
+
+# Prevenir listado de directorios
+Options -Indexes
+
+# Proteger archivos PHP
+<FilesMatch "\.(php|inc)$">
+    Deny from all
+</FilesMatch>
+
+<Files "auth.php">
+    Allow from all
+</Files>
+
+# CORS
+Header set Access-Control-Allow-Origin "https://tudominio.com"
+Header set Access-Control-Allow-Methods "POST, GET, OPTIONS"
+Header set Access-Control-Allow-Headers "Content-Type, Authorization"
