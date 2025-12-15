@@ -220,156 +220,127 @@
     </div>
     
     <!-- Scripts -->
-    <script src="js/auth.js"></script>
-    <script>
-        // Inicializar cuando el DOM esté listo
-        document.addEventListener('DOMContentLoaded', async function() {
-            // Verificar autenticación
-            const verification = await AuthSystem.verifySession();
-            
-            if (!verification.valid) {
-                window.location.href = 'index.html';
-                return;
-            }
-            
-            // Cargar información del usuario
-            const user = AuthSystem.getCurrentUser();
-            
-            // Actualizar UI
-            document.getElementById('usernameDisplay').textContent = user.name;
-            document.getElementById('infoUsername').textContent = user.name;
-            document.getElementById('infoUserType').textContent = 
-                user.user_type === 'admin' ? 'Administrador' : 'Usuario';
-            document.getElementById('infoStatus').textContent = user.status;
-            document.getElementById('infoStatus').style.color = 
-                user.status === 'active' ? '#00ff88' : '#ff4b4b';
-            document.getElementById('infoMaxDevices').textContent = user.max_devices;
-            
-            // Información de dispositivo
-            const deviceId = localStorage.getItem('secure_device_id') || 'No detectado';
-            document.getElementById('infoDeviceId').textContent = deviceId;
-            
-            // Información de tiempo
-            const now = new Date();
-            document.getElementById('infoLoginTime').textContent = now.toLocaleTimeString();
-            document.getElementById('infoLastActivity').textContent = now.toLocaleTimeString();
-            
-            // Actualizar tiempo restante
-            function updateSessionTime() {
-                const timeLeft = AuthSystem.getSessionTimeLeft();
-                const timeLeftElement = document.getElementById('infoTimeLeft');
-                const statusElement = document.getElementById('sessionStatus');
-                
-                if (timeLeft > 10) {
-                    timeLeftElement.textContent = `${timeLeft} minutos`;
-                    timeLeftElement.style.color = '#00ff88';
-                    statusElement.className = 'session-status status-active';
-                    statusElement.textContent = 'Activa';
-                } else if (timeLeft > 0) {
-                    timeLeftElement.textContent = `${timeLeft} minutos`;
-                    timeLeftElement.style.color = '#ffc107';
-                    statusElement.className = 'session-status status-warning';
-                    statusElement.textContent = 'Por expirar';
-                } else {
-                    timeLeftElement.textContent = 'Expirada';
-                    timeLeftElement.style.color = '#ff4b4b';
-                    statusElement.className = 'session-status';
-                    statusElement.textContent = 'Expirada';
-                    statusElement.style.background = 'rgba(255, 75, 75, 0.2)';
-                    statusElement.style.color = '#ff9b9b';
-                    
-                    // Redirigir después de 3 segundos
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 3000);
-                }
-            }
-            
-            // Actualizar tiempo cada minuto
-            updateSessionTime();
-            setInterval(updateSessionTime, 60000);
-            
-            // Configurar eventos
-            document.getElementById('logoutBtn').addEventListener('click', async function() {
-                await AuthSystem.logout();
-                window.location.href = 'index.html';
-            });
-            
-            document.getElementById('loadStreamBtn').addEventListener('click', loadStream);
-            document.getElementById('refreshStreamBtn').addEventListener('click', loadStream);
-            
-            document.getElementById('checkSessionBtn').addEventListener('click', async function() {
-                const verification = await AuthSystem.verifySession();
-                showMessage(
-                    verification.valid ? 'success' : 'error',
-                    verification.valid ? '✅ Sesión válida' : '❌ Sesión inválida'
-                );
-            });
-            
-            document.getElementById('showInfoBtn').addEventListener('click', function() {
-                showMessage('success', 
-                    `Usuario: ${user.name} | Tipo: ${user.user_type} | Dispositivo: ${deviceId.substring(0, 20)}...`
-                );
-            });
-            
-            // Cargar stream automáticamente después de 2 segundos
-            setTimeout(loadStream, 2000);
-            
-            // Protección contra inspección
-            setupProtection();
+    <script src="js/auth-nocodb.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', async function() {
+        // Verificar autenticación
+        const isValid = await NocoDBAuth.verifySession();
+        
+        if (!isValid) {
+            window.location.href = 'index.html';
+            return;
+        }
+        
+        // Cargar información del usuario
+        const user = NocoDBAuth.getCurrentUser();
+        
+        if (!user) {
+            window.location.href = 'index.html';
+            return;
+        }
+        
+        // Actualizar UI
+        document.getElementById('usernameDisplay').textContent = user.name;
+        document.getElementById('infoUsername').textContent = user.name;
+        document.getElementById('infoUserType').textContent = 
+            user.user_type === 'admin' ? 'Administrador' : 'Usuario';
+        document.getElementById('infoStatus').textContent = user.status;
+        document.getElementById('infoStatus').style.color = 
+            user.status === 'active' ? '#00ff88' : '#ff4b4b';
+        document.getElementById('infoMaxDevices').textContent = user.max_devices;
+        
+        // Información de dispositivo
+        const deviceId = localStorage.getItem('nocodb_device_id') || 'No detectado';
+        document.getElementById('infoDeviceId').textContent = deviceId;
+        
+        // Configurar eventos
+        document.getElementById('logoutBtn').addEventListener('click', async function() {
+            await NocoDBAuth.logout();
+            window.location.href = 'index.html';
         });
         
-        // Función para cargar el stream
-        async function loadStream() {
-            const streamUrl = AuthSystem.getCurrentStream();
-            
-            if (!streamUrl) {
-                showMessage('error', 'No hay stream disponible para este usuario');
-                return;
-            }
-            
-            try {
-                const videoPlayer = document.getElementById('liveStream');
-                const overlay = document.getElementById('videoOverlay');
-                
-                // Ocultar overlay
-                overlay.style.display = 'none';
-                
-                // Configurar y mostrar video
-                videoPlayer.src = streamUrl;
-                videoPlayer.style.display = 'block';
-                
-                // Intentar reproducir automáticamente
-                const playPromise = videoPlayer.play();
-                if (playPromise !== undefined) {
-                    playPromise.catch(error => {
-                        console.log('Auto-play prevented:', error);
-                        // El usuario debe hacer click manualmente
-                    });
-                }
-                
-                showMessage('success', 'Stream cargado exitosamente');
-                
-            } catch (error) {
-                showMessage('error', 'Error al cargar el stream: ' + error.message);
-                
-                // Mostrar overlay de error
-                const overlay = document.getElementById('videoOverlay');
-                overlay.innerHTML = `
-                    <i class="fas fa-exclamation-triangle" style="color: #ff4b4b;"></i>
-                    <h2>Error al cargar el stream</h2>
-                    <p style="margin: 15px 0; color: #ccc;">${error.message}</p>
-                    <button class="btn btn-primary" id="retryBtn">
-                        <i class="fas fa-redo"></i>
-                        Reintentar
-                    </button>
-                `;
-                overlay.style.display = 'flex';
-                
-                // Configurar botón de reintentar
-                document.getElementById('retryBtn').addEventListener('click', loadStream);
-            }
+        document.getElementById('loadStreamBtn').addEventListener('click', loadStream);
+        document.getElementById('refreshStreamBtn').addEventListener('click', loadStream);
+        
+        // Cargar stream automáticamente
+        setTimeout(loadStream, 2000);
+        
+        // Monitorear sesión
+        startSessionMonitoring();
+    });
+    
+    // Función para cargar stream desde NocoDB
+    async function loadStream() {
+        const streamUrl = NocoDBAuth.getCurrentStream();
+        
+        if (!streamUrl) {
+            showMessage('error', 'No hay stream configurado para este usuario');
+            return;
         }
+        
+        try {
+            const videoPlayer = document.getElementById('liveStream');
+            const overlay = document.getElementById('videoOverlay');
+            
+            // Verificar que el stream sea accesible
+            const testResponse = await fetch(streamUrl, { method: 'HEAD' });
+            
+            if (!testResponse.ok) {
+                throw new Error('El stream no está disponible');
+            }
+            
+            // Ocultar overlay y mostrar video
+            overlay.style.display = 'none';
+            videoPlayer.src = streamUrl;
+            videoPlayer.style.display = 'block';
+            
+            // Intentar reproducir
+            const playPromise = videoPlayer.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.log('Auto-play prevented:', error);
+                });
+            }
+            
+            showMessage('success', 'Stream cargado desde NocoDB');
+            
+        } catch (error) {
+            console.error('Stream error:', error);
+            showMessage('error', 'Error al cargar el stream: ' + error.message);
+            
+            // Mostrar overlay de error
+            const overlay = document.getElementById('videoOverlay');
+            overlay.innerHTML = `
+                <i class="fas fa-exclamation-triangle" style="color: #ff4b4b;"></i>
+                <h2>Error al cargar el stream</h2>
+                <p style="margin: 15px 0; color: #ccc;">${error.message}</p>
+                <p style="font-size: 0.9rem; color: #aaa;">
+                    <i class="fas fa-database"></i>
+                    Stream URL: ${NocoDBAuth.getCurrentStream()?.substring(0, 50)}...
+                </p>
+                <button class="btn btn-primary" id="retryBtn">
+                    <i class="fas fa-redo"></i>
+                    Reintentar
+                </button>
+            `;
+            overlay.style.display = 'flex';
+            
+            document.getElementById('retryBtn').addEventListener('click', loadStream);
+        }
+    }
+    
+    // Monitorear sesión
+    function startSessionMonitoring() {
+        setInterval(async () => {
+            const isValid = await NocoDBAuth.verifySession();
+            if (!isValid) {
+                showMessage('error', 'Sesión expirada. Redirigiendo...');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 3000);
+            }
+        }, 30000);
+    }
         
         // Función para mostrar mensajes
         function showMessage(type, text) {
