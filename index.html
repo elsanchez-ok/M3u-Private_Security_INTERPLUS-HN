@@ -3,73 +3,813 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Fácil</title>
+    <title>SecureStream | Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: #1a1a2e; color: white; font-family: Arial; }
-        .login-box { width: 300px; margin: 100px auto; padding: 30px; background: rgba(255,255,255,0.1); border-radius: 10px; }
-        input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc; }
-        button { width: 100%; padding: 10px; background: #0f3460; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        
+        body {
+            background: #0a0a0f;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Fondo animado tecnológico */
+        .bg-animation {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        .grid-lines {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(to right, rgba(0, 183, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 183, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: gridMove 20s linear infinite;
+        }
+        
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .float-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 183, 255, 0.1), transparent);
+            animation: float 15s infinite ease-in-out;
+        }
+        
+        .float-circle:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            top: -150px;
+            right: -150px;
+            animation-delay: 0s;
+        }
+        
+        .float-circle:nth-child(2) {
+            width: 200px;
+            height: 200px;
+            bottom: -100px;
+            left: -100px;
+            animation-delay: 5s;
+        }
+        
+        .float-circle:nth-child(3) {
+            width: 150px;
+            height: 150px;
+            top: 50%;
+            right: 10%;
+            animation-delay: 10s;
+        }
+        
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(40px, 40px); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+            50% { transform: translate(-30px, -30px) scale(1.1); opacity: 0.5; }
+        }
+        
+        /* Contenedor principal */
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(15, 20, 30, 0.85);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 50px 40px;
+            box-shadow: 
+                0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(0, 183, 255, 0.1),
+                0 0 100px rgba(0, 183, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            z-index: 1;
+        }
+        
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(0, 183, 255, 0.4), 
+                rgba(0, 183, 255, 0.8),
+                rgba(0, 183, 255, 0.4),
+                transparent);
+            animation: scanLine 3s infinite linear;
+        }
+        
+        @keyframes scanLine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* Logo y título */
+        .logo-section {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .logo-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #00b7ff, #0066ff);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 10px 30px rgba(0, 183, 255, 0.3);
+            position: relative;
+        }
+        
+        .logo-icon::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(135deg, #00b7ff, #0066ff, #00b7ff);
+            border-radius: 22px;
+            z-index: -1;
+            filter: blur(10px);
+            opacity: 0.5;
+        }
+        
+        .logo-icon i {
+            font-size: 32px;
+            color: white;
+        }
+        
+        .logo-section h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(to right, #ffffff, #00b7ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+        
+        .logo-section p {
+            color: #88d3ff;
+            font-size: 14px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        
+        /* Campos de entrada */
+        .input-group {
+            margin-bottom: 28px;
+            position: relative;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #a0cfff;
+            font-size: 13px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .input-wrapper {
+            position: relative;
+            border: 1px solid rgba(0, 183, 255, 0.2);
+            border-radius: 12px;
+            background: rgba(10, 15, 25, 0.6);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .input-wrapper:focus-within {
+            border-color: #00b7ff;
+            box-shadow: 0 0 0 3px rgba(0, 183, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .input-wrapper i {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #00b7ff;
+            font-size: 18px;
+            z-index: 1;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 18px 20px 18px 55px;
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 400;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .input-group input:focus {
+            background: rgba(0, 183, 255, 0.02);
+        }
+        
+        /* Botón de login */
+        .btn-login {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #00b7ff, #0066ff);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 1px;
+        }
+        
+        .btn-login::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 183, 255, 0.4);
+        }
+        
+        .btn-login:hover::before {
+            left: 100%;
+        }
+        
+        .btn-login:active {
+            transform: translateY(-1px);
+        }
+        
+        /* Mensajes */
+        .message-box {
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+            animation: fadeIn 0.3s ease;
+            border: 1px solid transparent;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message-box.error {
+            background: rgba(255, 75, 75, 0.1);
+            border-color: rgba(255, 75, 75, 0.3);
+            color: #ff9b9b;
+            display: block;
+        }
+        
+        .message-box.success {
+            background: rgba(0, 255, 136, 0.1);
+            border-color: rgba(0, 255, 136, 0.3);
+            color: #80ffd4;
+            display: block;
+        }
+        
+        .message-box.warning {
+            background: rgba(255, 193, 7, 0.1);
+            border-color: rgba(255, 193, 7, 0.3);
+            color: #ffe082;
+            display: block;
+        }
+        
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(0, 183, 255, 0.2);
+            border-top-color: #00b7ff;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Información de usuarios */
+        .user-info {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(10, 15, 25, 0.5);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 183, 255, 0.1);
+        }
+        
+        .user-info h3 {
+            color: #00b7ff;
+            font-size: 14px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .user-info ul {
+            list-style: none;
+        }
+        
+        .user-info li {
+            padding: 8px 0;
+            color: #a0cfff;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(0, 183, 255, 0.05);
+        }
+        
+        .user-info li:last-child {
+            border-bottom: none;
+        }
+        
+        .user-type {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        
+        .user-type.admin {
+            background: rgba(0, 183, 255, 0.2);
+            color: #00b7ff;
+        }
+        
+        .user-type.user {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+        
+        .footer a {
+            color: #00b7ff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer a:hover {
+            color: #ffffff;
+        }
+        
+        /* Responsive */
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 40px 25px;
+                margin: 20px;
+                border-radius: 20px;
+            }
+            
+            .logo-icon {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .logo-section h1 {
+                font-size: 24px;
+            }
+            
+            .input-group input {
+                padding: 16px 20px 16px 50px;
+            }
+        }
+        
+        /* Efecto de partículas */
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(0, 183, 255, 0.5);
+            border-radius: 50%;
+            animation: particleFloat 15s infinite linear;
+        }
+        
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="login-box">
-        <h2>📺 Sistema de Streaming</h2>
-        <div id="message" style="color: red; display: none;"></div>
-        <input type="text" id="username" placeholder="Usuario" value="admin">
-        <input type="password" id="password" placeholder="Contraseña" value="admin123">
-        <button onclick="login()">Entrar</button>
+    <!-- Fondo animado -->
+    <div class="bg-animation">
+        <div class="grid-lines"></div>
+        <div class="floating-elements">
+            <div class="float-circle"></div>
+            <div class="float-circle"></div>
+            <div class="float-circle"></div>
+        </div>
+    </div>
+    
+    <!-- Partículas -->
+    <div class="particles" id="particles"></div>
+    
+    <!-- Contenedor de login -->
+    <div class="login-container">
+        <!-- Logo -->
+        <div class="logo-section">
+            <div class="logo-icon">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h1>SecureStream Pro</h1>
+            <p>Access Control System</p>
+        </div>
         
-        <div style="margin-top: 20px; font-size: 12px; color: #aaa;">
-            <p><strong>Usuarios de prueba:</strong></p>
-            <p>• Admin: admin / admin123</p>
-            <p>• Usuario: usuario / cliente123</p>
-            <p>• Invitado: invitado / invitado2024</p>
+        <!-- Mensajes -->
+        <div class="message-box" id="messageBox"></div>
+        
+        <!-- Loading -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Verificando credenciales...</p>
+        </div>
+        
+        <!-- Formulario -->
+        <div class="input-group">
+            <label for="username"><i class="fas fa-user"></i> Usuario</label>
+            <div class="input-wrapper">
+                <i class="fas fa-user-circle"></i>
+                <input type="text" id="username" placeholder="Ingresa tu usuario" value="admin">
+            </div>
+        </div>
+        
+        <div class="input-group">
+            <label for="password"><i class="fas fa-key"></i> Contraseña</label>
+            <div class="input-wrapper">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="password" placeholder="Ingresa tu contraseña" value="admin123">
+            </div>
+        </div>
+        
+        <button class="btn-login" id="loginBtn">
+            <i class="fas fa-sign-in-alt"></i>
+            <span>ACCEDER AL SISTEMA</span>
+        </button>
+        
+        <!-- Información de usuarios -->
+        <div class="user-info">
+            <h3><i class="fas fa-users"></i> Usuarios de Prueba</h3>
+            <ul>
+                <li>
+                    <span>admin</span>
+                    <span class="user-type admin">ADMIN</span>
+                </li>
+                <li>
+                    <span>usuario</span>
+                    <span class="user-type user">USER</span>
+                </li>
+                <li>
+                    <span>invitado</span>
+                    <span class="user-type user">USER</span>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p>Sistema de streaming seguro | v2.5.1</p>
+            <p style="margin-top: 5px;">© 2024 SecureStream Technologies</p>
         </div>
     </div>
 
     <script>
-        async function login() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+        // Configuración
+        const API_BASE_URL = 'https://tudominio.com/api'; // Cambia esto
+        const VERSION = '2.5.1';
+        
+        // Credenciales válidas (texto plano para facilidad)
+        const VALID_USERS = {
+            'admin': { 
+                password: 'admin123', 
+                type: 'admin',
+                name: 'Administrador',
+                color: '#00b7ff'
+            },
+            'usuario': { 
+                password: 'cliente123', 
+                type: 'user',
+                name: 'Usuario Premium',
+                color: '#00ff88'
+            },
+            'invitado': { 
+                password: 'invitado2024', 
+                type: 'user',
+                name: 'Usuario Invitado',
+                color: '#ffaa00'
+            }
+        };
+        
+        // Elementos DOM
+        const elements = {
+            messageBox: document.getElementById('messageBox'),
+            loading: document.getElementById('loading'),
+            loginBtn: document.getElementById('loginBtn'),
+            username: document.getElementById('username'),
+            password: document.getElementById('password')
+        };
+        
+        // Crear partículas
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
             
-            // Mostrar loading
-            document.getElementById('message').style.color = 'yellow';
-            document.getElementById('message').textContent = 'Conectando...';
-            document.getElementById('message').style.display = 'block';
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                // Posición aleatoria
+                const left = Math.random() * 100;
+                const top = Math.random() * 100;
+                const size = Math.random() * 2 + 1;
+                const duration = Math.random() * 10 + 10;
+                const delay = Math.random() * 5;
+                
+                particle.style.left = `${left}%`;
+                particle.style.top = `${top}%`;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.animationDuration = `${duration}s`;
+                particle.style.animationDelay = `${delay}s`;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // Mostrar mensaje
+        function showMessage(type, text) {
+            elements.messageBox.className = `message-box ${type}`;
+            elements.messageBox.innerHTML = `
+                <i class="fas fa-${type === 'error' ? 'exclamation-triangle' : 
+                                  type === 'success' ? 'check-circle' : 
+                                  'info-circle'}"></i>
+                ${text}
+            `;
+            elements.messageBox.style.display = 'block';
             
-            // Simular API (en realidad sería a tu backend)
+            // Ocultar después de 5 segundos (excepto errores)
+            if (type !== 'error') {
+                setTimeout(() => {
+                    elements.messageBox.style.display = 'none';
+                }, 5000);
+            }
+        }
+        
+        // Mostrar/ocultar loading
+        function showLoading(show) {
+            elements.loading.style.display = show ? 'block' : 'none';
+            elements.loginBtn.style.display = show ? 'none' : 'flex';
+        }
+        
+        // Login con texto plano (sencillo para usuarios)
+        async function login(username, password) {
+            showLoading(true);
+            
+            // Simular delay de red
+            await new Promise(resolve => setTimeout(resolve, 800));
+            
+            // Verificar credenciales
+            const user = VALID_USERS[username];
+            
+            if (!user) {
+                showLoading(false);
+                showMessage('error', 'Usuario no encontrado');
+                return { success: false };
+            }
+            
+            if (user.password !== password) {
+                showLoading(false);
+                showMessage('error', 'Contraseña incorrecta');
+                return { success: false };
+            }
+            
+            // Login exitoso
+            showMessage('success', `¡Bienvenido ${user.name}!`);
+            
+            // Guardar sesión en localStorage (texto plano, pero solo para demo)
+            const sessionData = {
+                username: username,
+                user_type: user.type,
+                login_time: new Date().toISOString(),
+                device_id: 'device_' + Date.now(),
+                color: user.color
+            };
+            
+            localStorage.setItem('secure_session', JSON.stringify(sessionData));
+            localStorage.setItem('user_name', user.name);
+            
+            // Redirección con efecto
             setTimeout(() => {
-                // Credenciales válidas
-                const validUsers = {
-                    'admin': { password: 'admin123', type: 'admin' },
-                    'usuario': { password: 'cliente123', type: 'user' },
-                    'invitado': { password: 'invitado2024', type: 'user' }
-                };
+                // Efecto de transición
+                document.querySelector('.login-container').style.opacity = '0';
+                document.querySelector('.login-container').style.transform = 'translateY(-20px)';
                 
-                const user = validUsers[username];
-                
-                if (user && user.password === password) {
-                    // Guardar sesión
-                    localStorage.setItem('user', username);
-                    localStorage.setItem('isAdmin', user.type === 'admin');
-                    
-                    // Redirigir
+                setTimeout(() => {
                     if (user.type === 'admin') {
                         window.location.href = 'admin.html';
                     } else {
                         window.location.href = 'dashboard.html';
                     }
-                } else {
-                    document.getElementById('message').style.color = 'red';
-                    document.getElementById('message').textContent = 'Usuario o contraseña incorrectos';
-                }
-            }, 1000);
+                }, 300);
+            }, 1500);
+            
+            return { success: true, user: user };
         }
         
-        // Enter para login
-        document.getElementById('password').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                login();
+        // Verificar si ya hay sesión
+        function checkExistingSession() {
+            const sessionData = localStorage.getItem('secure_session');
+            if (sessionData) {
+                try {
+                    const session = JSON.parse(sessionData);
+                    const loginTime = new Date(session.login_time);
+                    const now = new Date();
+                    const diffHours = (now - loginTime) / (1000 * 60 * 60);
+                    
+                    // Sesión válida por 24 horas
+                    if (diffHours < 24) {
+                        if (session.user_type === 'admin') {
+                            window.location.href = 'admin.html';
+                        } else {
+                            window.location.href = 'dashboard.html';
+                        }
+                    }
+                } catch (e) {
+                    // Sesión inválida
+                    localStorage.removeItem('secure_session');
+                }
+            }
+        }
+        
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', () => {
+            // Crear partículas
+            createParticles();
+            
+            // Verificar sesión existente
+            checkExistingSession();
+            
+            // Evento del botón de login
+            elements.loginBtn.addEventListener('click', async () => {
+                const username = elements.username.value.trim();
+                const password = elements.password.value;
+                
+                if (!username || !password) {
+                    showMessage('error', 'Por favor completa todos los campos');
+                    return;
+                }
+                
+                await login(username, password);
+            });
+            
+            // Login con Enter
+            elements.password.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    elements.loginBtn.click();
+                }
+            });
+            
+            // Efectos de focus en inputs
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.style.borderColor = '#00b7ff';
+                    this.parentElement.style.boxShadow = '0 0 0 3px rgba(0, 183, 255, 0.1)';
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.parentElement.style.borderColor = 'rgba(0, 183, 255, 0.2)';
+                    this.parentElement.style.boxShadow = 'none';
+                });
+            });
+            
+            // Efecto de escritura automática para demo
+            setTimeout(() => {
+                if (elements.username.value === '') {
+                    const demoUsername = 'admin';
+                    let i = 0;
+                    
+                    const typeWriter = () => {
+                        if (i < demoUsername.length) {
+                            elements.username.value += demoUsername.charAt(i);
+                            i++;
+                            setTimeout(typeWriter, 100);
+                        }
+                    };
+                    
+                    typeWriter();
+                }
+            }, 1000);
+            
+            // Mostrar versión en consola
+            console.log(`%c SecureStream Pro v${VERSION} %c 🔐 Sistema seguro`, 
+                'background: linear-gradient(135deg, #00b7ff, #0066ff); color: white; padding: 5px 15px; border-radius: 5px;',
+                'color: #00b7ff; font-weight: bold;');
+        });
+        
+        // Efecto de teclas (opcional)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const inputs = document.querySelectorAll('input');
+                const active = document.activeElement;
+                const index = Array.from(inputs).indexOf(active);
+                
+                if (index > -1 && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                } else {
+                    inputs[0].focus();
+                }
             }
         });
     </script>
