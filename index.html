@@ -3,176 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Sistema Seguro</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Login - Sistema Seguro con NocoDB</title>
+    <link rel="stylesheet" href="css/styles.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        
-        .login-container {
-            width: 100%;
-            max-width: 450px;
-            background-color: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-            overflow: hidden;
-            padding: 40px;
-        }
-        
-        .logo {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .logo h1 {
-            font-size: 2.5rem;
-            background: linear-gradient(to right, #8a2387, #e94057, #f27121);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-        }
-        
-        .input-group {
-            margin-bottom: 25px;
-            position: relative;
-        }
-        
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #e6e6e6;
-        }
-        
-        .input-group input {
-            width: 100%;
-            padding: 15px 15px 15px 50px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            color: #fff;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-        
-        .input-group input:focus {
-            border-color: #8a2387;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(138, 35, 135, 0.3);
-        }
-        
-        .input-group i {
-            position: absolute;
-            left: 18px;
-            top: 43px;
-            color: #aaa;
-            font-size: 1.2rem;
-        }
-        
-        .btn-login {
-            background: linear-gradient(to right, #8a2387, #e94057);
-            color: white;
-            border: none;
-            padding: 16px;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        
-        .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 7px 14px rgba(233, 64, 87, 0.3);
-        }
-        
-        .message {
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-weight: 600;
-            display: none;
-        }
-        
-        .message.error {
-            background-color: rgba(233, 64, 87, 0.2);
-            border-left: 4px solid #e94057;
-            color: #ff6b8b;
-            display: block;
-        }
-        
-        .message.warning {
-            background-color: rgba(242, 113, 33, 0.2);
-            border-left: 4px solid #f27121;
-            color: #ffcc80;
-            display: block;
-        }
-        
-        .device-info {
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-            font-size: 0.9rem;
-            color: #aaa;
-            text-align: center;
-        }
-        
-        .footer {
-            margin-top: 30px;
-            text-align: center;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 0.9rem;
-        }
-        
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 10px;
-        }
-        
-        .spinner {
-            border: 3px solid rgba(255, 255, 255, 0.1);
-            border-left-color: #8a2387;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        /* Estilos del login */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .login-container { width: 100%; max-width: 450px; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 20px; padding: 40px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); }
+        .logo { text-align: center; margin-bottom: 30px; }
+        .logo h1 { font-size: 2.5rem; background: linear-gradient(to right, #8a2387, #e94057); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .input-group { margin-bottom: 25px; position: relative; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #e6e6e6; }
+        .input-group input { width: 100%; padding: 15px 15px 15px 50px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); border-radius: 10px; color: #fff; font-size: 1rem; }
+        .input-group i { position: absolute; left: 18px; top: 43px; color: #aaa; }
+        .btn-login { background: linear-gradient(to right, #8a2387, #e94057); color: white; border: none; padding: 16px; border-radius: 10px; font-size: 1.1rem; font-weight: 600; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
+        .message { padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; display: none; }
+        .message.error { background: rgba(233, 64, 87, 0.2); border-left: 4px solid #e94057; color: #ff6b8b; display: block; }
+        .message.warning { background: rgba(242, 113, 33, 0.2); border-left: 4px solid #f27121; color: #ffcc80; display: block; }
     </style>
 </head>
 <body>
     <div class="login-container">
         <div class="logo">
             <h1><i class="fas fa-shield-alt"></i> SecureStream</h1>
-            <p>Acceso seguro al sistema</p>
+            <p>Autenticación con NocoDB</p>
         </div>
         
         <div class="message" id="message"></div>
@@ -180,56 +34,37 @@
         <div class="input-group">
             <label for="username"><i class="fas fa-user"></i> Usuario</label>
             <input type="text" id="username" placeholder="Ingresa tu usuario">
-            <i class="fas fa-user"></i>
         </div>
         
         <div class="input-group">
             <label for="password"><i class="fas fa-key"></i> Contraseña</label>
             <input type="password" id="password" placeholder="Ingresa tu contraseña">
-            <i class="fas fa-key"></i>
-        </div>
-        
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <p>Verificando credenciales...</p>
         </div>
         
         <button class="btn-login" id="loginBtn">
             <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
         </button>
         
-        <div class="device-info">
-            <i class="fas fa-desktop"></i> 
-            <span id="deviceId">Cargando ID del dispositivo...</span>
-        </div>
-        
-        <div class="footer">
-            <p>Sistema protegido - Una sesión por dispositivo</p>
-            <p style="font-size: 0.8rem; margin-top: 5px;">v2.0</p>
+        <div style="text-align: center; margin-top: 20px; color: #aaa; font-size: 0.9rem;">
+            <p>Sistema seguro con autenticación real</p>
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <script>
-        // Configuración - DEBES CAMBIAR ESTO
-        const API_BASE_URL = 'https://api.mocki.io/v2'; // URL de tu backend
-        const APP_VERSION = '2.0';
+        // Configuración
+        const API_BASE_URL = 'https://tudominio.com/api'; // Cambia por tu dominio
         
-        // Generar ID único del dispositivo
+        // Generar ID del dispositivo
         function generateDeviceId() {
             let deviceId = localStorage.getItem('secure_device_id');
             if (!deviceId) {
                 const navigatorInfo = navigator.userAgent + navigator.language + screen.width + screen.height;
-                const hash = btoa(navigatorInfo).substring(0, 32);
+                const hash = btoa(navigatorInfo).substr(0, 32);
                 deviceId = 'dev_' + Date.now() + '_' + hash;
                 localStorage.setItem('secure_device_id', deviceId);
             }
             return deviceId;
-        }
-        
-        // Mostrar/ocultar loading
-        function showLoading(show) {
-            document.getElementById('loading').style.display = show ? 'block' : 'none';
-            document.getElementById('loginBtn').style.display = show ? 'none' : 'flex';
         }
         
         // Mostrar mensaje
@@ -240,24 +75,18 @@
             messageEl.style.display = 'block';
         }
         
-        // Función de login
+        // Login con NocoDB
         async function login(username, password) {
-            showLoading(true);
-            
             const deviceId = generateDeviceId();
-            const userAgent = navigator.userAgent;
             
             try {
                 const response = await fetch(`${API_BASE_URL}/auth.php?action=login`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         username: username,
                         password: password,
-                        deviceId: deviceId,
-                        userAgent: userAgent
+                        deviceId: deviceId
                     })
                 });
                 
@@ -265,6 +94,10 @@
                 
                 if (!response.ok) {
                     throw new Error(data.error || 'Error en la autenticación');
+                }
+                
+                if (!data.success) {
+                    throw new Error(data.error);
                 }
                 
                 // Guardar datos de sesión
@@ -281,31 +114,28 @@
                 }
                 
             } catch (error) {
-                showLoading(false);
+                console.error('Login error:', error);
                 
                 if (error.message.includes('otro dispositivo')) {
-                    showMessage('warning', error.message);
+                    showMessage('warning', error.message + '. Por favor, cierra sesión en el otro dispositivo primero.');
                 } else {
-                    showMessage('error', error.message);
+                    showMessage('error', error.message || 'Error en el servidor');
                 }
             }
         }
         
         // Inicializar
         document.addEventListener('DOMContentLoaded', () => {
-            // Mostrar ID del dispositivo
-            const deviceId = generateDeviceId();
-            document.getElementById('deviceId').textContent = 
-                `Dispositivo: ${deviceId.substring(0, 15)}...`;
-            
-            // Verificar si ya hay sesión
+            // Verificar sesión existente
             const token = localStorage.getItem('session_token');
             if (token) {
-                // Verificar validez de la sesión
                 fetch(`${API_BASE_URL}/auth.php?action=verify`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ token: token })
+                    body: JSON.stringify({
+                        token: token,
+                        deviceId: generateDeviceId()
+                    })
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -320,7 +150,7 @@
                 });
             }
             
-            // Evento del botón de login
+            // Evento login
             document.getElementById('loginBtn').addEventListener('click', () => {
                 const username = document.getElementById('username').value.trim();
                 const password = document.getElementById('password').value;
