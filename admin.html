@@ -216,155 +216,72 @@
     </div>
     
     <!-- Scripts -->
-    <script src="js/auth.js"></script>
-    <script>
-        // Inicializar cuando el DOM esté listo
-        document.addEventListener('DOMContentLoaded', async function() {
-            // Verificar autenticación y que sea admin
-            const verification = await AuthSystem.verifySession();
-            
-            if (!verification.valid) {
-                window.location.href = 'index.html';
-                return;
-            }
-            
-            const user = AuthSystem.getCurrentUser();
-            
-            if (user.user_type !== 'admin') {
-                window.location.href = 'dashboard.html';
-                return;
-            }
-            
-            // Configurar logout
-            document.getElementById('logoutBtn').addEventListener('click', async function() {
-                await AuthSystem.logout();
-                window.location.href = 'index.html';
-            });
-            
-            // Cargar datos iniciales
-            loadUsers();
-            loadSessions();
-            startUptimeCounter();
+    
+    <script src="js/auth-nocodb.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', async function() {
+        // Verificar autenticación y que sea admin
+        const isValid = await NocoDBAuth.verifySession();
+        
+        if (!isValid) {
+            window.location.href = 'index.html';
+            return;
+        }
+        
+        const user = NocoDBAuth.getCurrentUser();
+        
+        if (!user || user.user_type !== 'admin') {
+            window.location.href = 'dashboard.html';
+            return;
+        }
+        
+        // Configurar logout
+        document.getElementById('logoutBtn').addEventListener('click', async function() {
+            await NocoDBAuth.logout();
+            window.location.href = 'index.html';
         });
         
-        // Cargar lista de usuarios
-        function loadUsers() {
-            const users = AuthSystem.users;
+        // Cargar datos de usuarios desde NocoDB
+        loadUsersFromNocoDB();
+    });
+    
+    // Cargar usuarios desde NocoDB
+    async function loadUsersFromNocoDB() {
+        try {
+            // Nota: Necesitarías agregar una función a NocoDBAuth para obtener todos los usuarios
+            // Por ahora, mostramos solo el usuario actual
+            
+            const currentUser = NocoDBAuth.getCurrentUser();
             const usersList = document.getElementById('usersList');
-            const totalUsers = document.getElementById('totalUsers');
-            const activeUsers = document.getElementById('activeUsers');
-            const sysTotalUsers = document.getElementById('sysTotalUsers');
             
-            usersList.innerHTML = '';
-            let activeCount = 0;
-            
-            for (const [username, user] of Object.entries(users)) {
-                const userItem = document.createElement('div');
-                userItem.className = 'user-item';
-                
-                userItem.innerHTML = `
-                    <div class="user-info">
-                        <strong>${user.name}</strong><br>
-                        <small style="color: #a0cfff;">@${username}</small>
-                    </div>
-                    <div class="user-actions">
-                        <span class="badge ${user.user_type === 'admin' ? 'badge-warning' : 'badge-info'}">
-                            ${user.user_type === 'admin' ? 'ADMIN' : 'USER'}
-                        </span>
-                        <span class="badge ${user.status === 'active' ? 'badge-success' : 'badge-danger'}">
-                            ${user.status === 'active' ? 'ACTIVO' : 'INACTIVO'}
-                        </span>
+            if (usersList && currentUser) {
+                usersList.innerHTML = `
+                    <div class="user-item">
+                        <div class="user-info">
+                            <strong>${currentUser.name}</strong><br>
+                            <small style="color: #a0cfff;">@${currentUser.username}</small>
+                        </div>
+                        <div class="user-actions">
+                            <span class="badge ${currentUser.user_type === 'admin' ? 'badge-warning' : 'badge-info'}">
+                                ${currentUser.user_type === 'admin' ? 'ADMIN' : 'USER'}
+                            </span>
+                            <span class="badge ${currentUser.status === 'active' ? 'badge-success' : 'badge-danger'}">
+                                ${currentUser.status === 'active' ? 'ACTIVO' : 'INACTIVO'}
+                            </span>
+                        </div>
                     </div>
                 `;
-                
-                usersList.appendChild(userItem);
-                
-                if (user.status === 'active') {
-                    activeCount++;
-                }
             }
             
-            totalUsers.textContent = Object.keys(users).length;
-            activeUsers.textContent = activeCount;
-            sysTotalUsers.textContent = Object.keys(users).length;
+            // Actualizar estadísticas
+            document.getElementById('totalUsers').textContent = '1';
+            document.getElementById('activeUsers').textContent = currentUser.status === 'active' ? '1' : '0';
+            document.getElementById('sysTotalUsers').textContent = '1';
+            
+        } catch (error) {
+            console.error('Error loading users:', error);
         }
-        
-        // Cargar sesiones activas
-        function loadSessions() {
-            const sessionsList = document.getElementById('sessionsList');
-            const activeSessions = document.getElementById('activeSessions');
-            const sysActiveSessions = document.getElementById('sysActiveSessions');
-            
-            sessionsList.innerHTML = '';
-            
-            // Obtener sesión actual
-            const sessionId = localStorage.getItem('current_session_id');
-            const deviceId = localStorage.getItem('secure_device_id');
-            const user = AuthSystem.getCurrentUser();
-            
-            if (sessionId && user) {
-                const sessionItem = document.createElement('div');
-                sessionItem.className = 'user-item';
-                sessionItem.style.background = 'rgba(0, 183, 255, 0.1)';
-                
-                sessionItem.innerHTML = `
-                    <div class="user-info">
-                        <strong>${user.name}</strong><br>
-                        <small style="color: #a0cfff;">Dispositivo: ${deviceId ? deviceId.substring(0, 15) + '...' : 'Desconocido'}</small>
-                    </div>
-                    <div class="user-actions">
-                        <span class="badge badge-success">ACTIVA</span>
-                    </div>
-                `;
-                
-                sessionsList.appendChild(sessionItem);
-                
-                activeSessions.textContent = '1';
-                sysActiveSessions.textContent = '1';
-            } else {
-                sessionsList.innerHTML = '<p style="color: #a0cfff; text-align: center;">No hay sesiones activas</p>';
-                activeSessions.textContent = '0';
-                sysActiveSessions.textContent = '0';
-            }
-        }
-        
-        // Refrescar sesiones
-        function refreshSessions() {
-            loadSessions();
-            showMessage('success', 'Sesiones actualizadas');
-        }
-        
-        // Contador de tiempo activo
-        function startUptimeCounter() {
-            let minutes = 0;
-            const uptimeElement = document.getElementById('sysUptime');
-            
-            setInterval(() => {
-                minutes++;
-                uptimeElement.textContent = `${minutes} min`;
-            }, 60000);
-        }
-        
-        // Función para mostrar mensajes
-        function showMessage(type, text) {
-            const messageEl = document.getElementById('message');
-            if (!messageEl) return;
-            
-            messageEl.className = `message ${type}`;
-            messageEl.innerHTML = `
-                <i class="fas fa-${type === 'error' ? 'exclamation-triangle' : 
-                                  type === 'success' ? 'check-circle' : 
-                                  'info-circle'}"></i>
-                ${text}
-            `;
-            messageEl.style.display = 'block';
-            
-            if (type !== 'error') {
-                setTimeout(() => {
-                    messageEl.style.display = 'none';
-                }, 5000);
-            }
-        }
-    </script>
+    }
+</script>
 </body>
 </html>
