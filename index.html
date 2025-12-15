@@ -398,25 +398,26 @@
     </div>
 
     <!-- Scripts -->
-    <script src="js/auth.js"></script>
-    <script>
-        // Inicializar cuando el DOM esté listo
-        document.addEventListener('DOMContentLoaded', function() {
-            // Crear partículas
-            createParticles();
-            
-            // Verificar si ya hay sesión
-            if (AuthSystem.isLoggedIn()) {
-                const user = AuthSystem.getCurrentUser();
-                if (user.user_type === 'admin') {
+    <script src="js/auth-nocodb.js"></script>
+<script>
+    // Configurar cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', function() {
+        // Verificar si ya hay sesión
+        NocoDBAuth.verifySession().then(isValid => {
+            if (isValid) {
+                const user = NocoDBAuth.getCurrentUser();
+                if (user && user.user_type === 'admin') {
                     window.location.href = 'admin.html';
-                } else {
+                } else if (user) {
                     window.location.href = 'dashboard.html';
                 }
             }
-            
-            // Configurar evento del botón de login
-            document.getElementById('loginBtn').addEventListener('click', async function() {
+        });
+        
+        // Configurar botón de login
+        const loginBtn = document.getElementById('loginBtn');
+        if (loginBtn) {
+            loginBtn.addEventListener('click', async function() {
                 const username = document.getElementById('username').value.trim();
                 const password = document.getElementById('password').value;
                 
@@ -427,14 +428,14 @@
                 
                 // Mostrar loading
                 document.getElementById('loading').style.display = 'block';
-                document.getElementById('loginBtn').style.display = 'none';
+                loginBtn.style.display = 'none';
                 
                 // Intentar login
-                const result = await AuthSystem.login(username, password);
+                const result = await NocoDBAuth.login(username, password);
                 
                 // Ocultar loading
                 document.getElementById('loading').style.display = 'none';
-                document.getElementById('loginBtn').style.display = 'flex';
+                loginBtn.style.display = 'flex';
                 
                 if (result.success) {
                     showMessage('success', `¡Bienvenido ${result.user.name}!`);
@@ -455,28 +456,18 @@
                     }
                 }
             });
-            
-            // Login con Enter
-            document.getElementById('password').addEventListener('keypress', function(e) {
+        }
+        
+        // Login con Enter
+        const passwordInput = document.getElementById('password');
+        if (passwordInput) {
+            passwordInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
-                    document.getElementById('loginBtn').click();
+                    loginBtn.click();
                 }
             });
-            
-            // Efectos de focus en inputs
-            const inputs = document.querySelectorAll('input');
-            inputs.forEach(input => {
-                input.addEventListener('focus', function() {
-                    this.parentElement.style.borderColor = '#00b7ff';
-                    this.parentElement.style.boxShadow = '0 0 0 3px rgba(0, 183, 255, 0.1)';
-                });
-                
-                input.addEventListener('blur', function() {
-                    this.parentElement.style.borderColor = 'rgba(0, 183, 255, 0.2)';
-                    this.parentElement.style.boxShadow = 'none';
-                });
-            });
-        });
+        }
+    });
         
         // Función para mostrar mensajes
         function showMessage(type, text) {
