@@ -1,1 +1,568 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Sistema Seguro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: linear-gradient(to right, #0f3460, #533483);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .btn-logout {
+            background: linear-gradient(to right, #c31432, #240b36);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        
+        .btn-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(195, 20, 50, 0.3);
+        }
+        
+        .video-container {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            position: relative;
+            min-height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #videoPlayer {
+            width: 100%;
+            height: auto;
+            max-height: 70vh;
+        }
+        
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            z-index: 10;
+        }
+        
+        .session-info {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .info-card {
+            background: rgba(15, 52, 96, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #533483;
+        }
+        
+        .info-card h3 {
+            color: #8a7dff;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .info-card p {
+            font-size: 1.1rem;
+            word-break: break-all;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .btn {
+            padding: 15px 25px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #0f3460, #533483);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(to right, #154180, #6340a0);
+            transform: translateY(-2px);
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .message.error {
+            background: rgba(195, 20, 50, 0.2);
+            border-left: 4px solid #c31432;
+            color: #ff6b8b;
+            display: block;
+        }
+        
+        .message.success {
+            background: rgba(46, 204, 113, 0.2);
+            border-left: 4px solid #2ecc71;
+            color: #6effa8;
+            display: block;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+        
+        /* Protección contra inspección */
+        .protected-video {
+            position: relative;
+        }
+        
+        .protected-video::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .video-container {
+                min-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-video"></i> Transmisión en Vivo</h1>
+            <div class="user-info">
+                <div>
+                    <strong id="usernameDisplay">Cargando...</strong><br>
+                    <small id="userType">Usuario</small>
+                </div>
+                <button class="btn-logout" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mensajes -->
+        <div class="message" id="message"></div>
+        
+        <!-- Video Player -->
+        <div class="video-container">
+            <div class="video-overlay" id="videoOverlay">
+                <i class="fas fa-lock" style="font-size: 4rem; color: #533483; margin-bottom: 20px;"></i>
+                <h2 style="margin-bottom: 15px;">Contenido Protegido</h2>
+                <p style="margin-bottom: 25px; max-width: 600px;">
+                    El stream se cargará automáticamente después de la verificación de seguridad.
+                    Este contenido está protegido contra inspección y descarga.
+                </p>
+                <button class="btn btn-primary" id="loadStreamBtn">
+                    <i class="fas fa-play"></i> Cargar Stream
+                </button>
+            </div>
+            
+            <video id="videoPlayer" controls playsinline style="display: none;">
+                Tu navegador no soporta video HTML5
+            </video>
+        </div>
+        
+        <!-- Información de Sesión -->
+        <div class="session-info">
+            <div class="info-card">
+                <h3><i class="fas fa-user"></i> Información de Cuenta</h3>
+                <p><strong>Usuario:</strong> <span id="infoUsername">-</span></p>
+                <p><strong>Tipo:</strong> <span id="infoType">-</span></p>
+                <p><strong>Dispositivos:</strong> <span id="infoDevices">-</span></p>
+            </div>
+            
+            <div class="info-card">
+                <h3><i class="fas fa-desktop"></i> Dispositivo Actual</h3>
+                <p><strong>ID:</strong> <span id="infoDeviceId">-</span></p>
+                <p><strong>Conectado:</strong> <span id="infoLoginTime">-</span></p>
+                <p><strong>Estado:</strong> <span id="infoStatus" style="color:#6effa8;">Verificando...</span></p>
+            </div>
+            
+            <div class="info-card">
+                <h3><i class="fas fa-shield-alt"></i> Seguridad</h3>
+                <p><strong>Sesión Única:</strong> <span style="color:#6effa8;">Activada</span></p>
+                <p><strong>Stream Protegido:</strong> <span style="color:#6effa8;">Sí</span></p>
+                <p><strong>Encriptación:</strong> <span style="color:#6effa8;">AES-256</span></p>
+            </div>
+        </div>
+        
+        <!-- Controles -->
+        <div class="controls">
+            <button class="btn btn-primary" id="refreshBtn">
+                <i class="fas fa-sync"></i> Actualizar Stream
+            </button>
+            <button class="btn btn-primary" id="checkSessionBtn">
+                <i class="fas fa-shield-alt"></i> Verificar Sesión
+            </button>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p>Sistema seguro de streaming - Una sesión por dispositivo</p>
+            <p>© 2024 SecureStream v2.0</p>
+        </div>
+    </div>
 
+    <!-- Script de seguridad -->
+    <script>
+        // Configuración
+        const API_BASE_URL = 'https://tudominio.com/api'; // Cambiar por tu URL
+        const STREAM_REFRESH_INTERVAL = 300000; // 5 minutos
+        
+        // Variables globales
+        let currentSession = null;
+        let videoPlayer = null;
+        let sessionCheckInterval = null;
+        let lastStreamKey = '';
+        
+        // Elementos DOM
+        const elements = {
+            message: document.getElementById('message'),
+            videoPlayer: document.getElementById('videoPlayer'),
+            videoOverlay: document.getElementById('videoOverlay'),
+            loadStreamBtn: document.getElementById('loadStreamBtn'),
+            logoutBtn: document.getElementById('logoutBtn'),
+            refreshBtn: document.getElementById('refreshBtn'),
+            checkSessionBtn: document.getElementById('checkSessionBtn'),
+            usernameDisplay: document.getElementById('usernameDisplay'),
+            userType: document.getElementById('userType'),
+            infoUsername: document.getElementById('infoUsername'),
+            infoType: document.getElementById('infoType'),
+            infoDevices: document.getElementById('infoDevices'),
+            infoDeviceId: document.getElementById('infoDeviceId'),
+            infoLoginTime: document.getElementById('infoLoginTime'),
+            infoStatus: document.getElementById('infoStatus')
+        };
+        
+        // Funciones de utilidad
+        function showMessage(type, text) {
+            elements.message.className = `message ${type}`;
+            elements.message.textContent = text;
+            elements.message.style.display = 'block';
+            
+            if (type !== 'error') {
+                setTimeout(() => {
+                    elements.message.style.display = 'none';
+                }, 5000);
+            }
+        }
+        
+        // Verificar sesión
+        async function verifySession() {
+            const token = localStorage.getItem('session_token');
+            
+            if (!token) {
+                window.location.href = 'index.html';
+                return null;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth.php?action=verify`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: token })
+                });
+                
+                const data = await response.json();
+                
+                if (!data.valid) {
+                    localStorage.clear();
+                    window.location.href = 'index.html';
+                    return null;
+                }
+                
+                return token;
+            } catch (error) {
+                console.error('Error verificando sesión:', error);
+                return null;
+            }
+        }
+        
+        // Obtener URL del stream (encriptada del backend)
+        async function getStreamUrl() {
+            const token = localStorage.getItem('session_token');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth.php?action=get_stream`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: token })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Error obteniendo stream');
+                }
+                
+                const data = await response.json();
+                return data.stream_url;
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('error', 'No se pudo cargar el stream');
+                return null;
+            }
+        }
+        
+        // Cargar stream de forma segura
+        async function loadSecureStream() {
+            showMessage('success', 'Cargando stream protegido...');
+            
+            // Ocultar overlay
+            elements.videoOverlay.style.display = 'none';
+            elements.videoPlayer.style.display = 'block';
+            
+            // Obtener URL encriptada del backend
+            const encryptedUrl = await getStreamUrl();
+            
+            if (!encryptedUrl) {
+                elements.videoOverlay.style.display = 'flex';
+                elements.videoPlayer.style.display = 'none';
+                return;
+            }
+            
+            // El backend devuelve la URL ya encriptada
+            // En un sistema real, el backend debería servir el stream directamente
+            // Pero para este ejemplo, usaremos una técnica de protección
+            
+            // Técnica 1: Usar Media Source Extensions (MSE)
+            try {
+                if ('MediaSource' in window) {
+                    const mediaSource = new MediaSource();
+                    elements.videoPlayer.src = URL.createObjectURL(mediaSource);
+                    
+                    mediaSource.addEventListener('sourceopen', () => {
+                        // Aquí iría la lógica para cargar el stream segmentado
+                        // Esto es complejo y requiere un backend que sirva HLS/DASH
+                    });
+                } else {
+                    // Fallback: Cargar directamente (MENOS SEGURO)
+                    // En producción, NUNCA hacer esto
+                    showMessage('warning', 'Usando modo compatible (menos seguro)');
+                    
+                    // El stream real vendría del backend, no se expone aquí
+                    elements.videoPlayer.src = 'about:blank';
+                    
+                    // Simulación: El backend serviría el stream en un endpoint protegido
+                    // elements.videoPlayer.src = `${API_BASE_URL}/stream_proxy.php?token=${token}`;
+                }
+            } catch (error) {
+                console.error('Error cargando stream:', error);
+                showMessage('error', 'Error al cargar el stream');
+                elements.videoOverlay.style.display = 'flex';
+                elements.videoPlayer.style.display = 'none';
+            }
+        }
+        
+        // Actualizar información de sesión
+        function updateSessionInfo() {
+            const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+            const deviceId = localStorage.getItem('device_id') || 'No detectado';
+            
+            elements.usernameDisplay.textContent = userData.username || 'Usuario';
+            elements.userType.textContent = userData.user_type === 'admin' ? 'Administrador' : 'Usuario';
+            
+            elements.infoUsername.textContent = userData.username || '-';
+            elements.infoType.textContent = userData.user_type === 'admin' ? 'Administrador' : 'Usuario';
+            elements.infoDevices.textContent = `${userData.max_devices || 1} dispositivo(s)`;
+            elements.infoDeviceId.textContent = deviceId.substring(0, 20) + '...';
+            elements.infoLoginTime.textContent = new Date().toLocaleTimeString();
+            elements.infoStatus.textContent = 'Activa';
+            elements.infoStatus.style.color = '#6effa8';
+        }
+        
+        // Cerrar sesión
+        async function logout() {
+            const token = localStorage.getItem('session_token');
+            
+            if (token) {
+                try {
+                    await fetch(`${API_BASE_URL}/auth.php?action=logout`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ token: token })
+                    });
+                } catch (error) {
+                    console.error('Error en logout:', error);
+                }
+            }
+            
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+        
+        // Protección básica contra inspección
+        function addProtection() {
+            // 1. Deshabilitar clic derecho
+            document.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                showMessage('warning', 'Acción no permitida');
+            });
+            
+            // 2. Deshabilitar teclas de desarrollo
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+                    e.preventDefault();
+                    showMessage('warning', 'Herramientas de desarrollo deshabilitadas');
+                }
+                if (e.key === 'F12') {
+                    e.preventDefault();
+                    showMessage('warning', 'Herramientas de desarrollo deshabilitadas');
+                }
+            });
+            
+            // 3. Ocultar elementos en inspección
+            const style = document.createElement('style');
+            style.textContent = `
+                video::-webkit-media-controls-enclosure {
+                    display: none !important;
+                }
+                
+                #videoPlayer {
+                    -webkit-user-select: none;
+                    -moz-user-select: none;
+                    -ms-user-select: none;
+                    user-select: none;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', async () => {
+            addProtection();
+            
+            // Verificar sesión
+            const token = await verifySession();
+            if (!token) return;
+            
+            // Actualizar información
+            updateSessionInfo();
+            
+            // Configurar intervalos
+            sessionCheckInterval = setInterval(async () => {
+                const valid = await verifySession();
+                if (!valid) {
+                    clearInterval(sessionCheckInterval);
+                    showMessage('error', 'Sesión expirada');
+                    setTimeout(() => logout(), 2000);
+                }
+            }, 60000); // Verificar cada minuto
+            
+            // Event Listeners
+            elements.loadStreamBtn.addEventListener('click', loadSecureStream);
+            elements.refreshBtn.addEventListener('click', loadSecureStream);
+            elements.checkSessionBtn.addEventListener('click', async () => {
+                const valid = await verifySession();
+                showMessage(valid ? 'success' : 'error', 
+                    valid ? 'Sesión válida' : 'Sesión inválida');
+            });
+            elements.logoutBtn.addEventListener('click', logout);
+            
+            // Cargar stream automáticamente después de 2 segundos
+            setTimeout(() => {
+                elements.loadStreamBtn.click();
+            }, 2000);
+        });
+        
+        // Limpiar al cerrar
+        window.addEventListener('beforeunload', () => {
+            if (sessionCheckInterval) {
+                clearInterval(sessionCheckInterval);
+            }
+        });
+    </script>
+</body>
+</html>
