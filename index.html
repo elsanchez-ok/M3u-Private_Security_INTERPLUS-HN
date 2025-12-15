@@ -3,172 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Sistema Seguro con NocoDB</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <title>Login Fácil</title>
     <style>
-        /* Estilos del login */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .login-container { width: 100%; max-width: 450px; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 20px; padding: 40px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); }
-        .logo { text-align: center; margin-bottom: 30px; }
-        .logo h1 { font-size: 2.5rem; background: linear-gradient(to right, #8a2387, #e94057); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .input-group { margin-bottom: 25px; position: relative; }
-        .input-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #e6e6e6; }
-        .input-group input { width: 100%; padding: 15px 15px 15px 50px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); border-radius: 10px; color: #fff; font-size: 1rem; }
-        .input-group i { position: absolute; left: 18px; top: 43px; color: #aaa; }
-        .btn-login { background: linear-gradient(to right, #8a2387, #e94057); color: white; border: none; padding: 16px; border-radius: 10px; font-size: 1.1rem; font-weight: 600; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
-        .message { padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; display: none; }
-        .message.error { background: rgba(233, 64, 87, 0.2); border-left: 4px solid #e94057; color: #ff6b8b; display: block; }
-        .message.warning { background: rgba(242, 113, 33, 0.2); border-left: 4px solid #f27121; color: #ffcc80; display: block; }
+        body { background: #1a1a2e; color: white; font-family: Arial; }
+        .login-box { width: 300px; margin: 100px auto; padding: 30px; background: rgba(255,255,255,0.1); border-radius: 10px; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc; }
+        button { width: 100%; padding: 10px; background: #0f3460; color: white; border: none; border-radius: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="logo">
-            <h1><i class="fas fa-shield-alt"></i> SecureStream</h1>
-            <p>Autenticación con NocoDB</p>
-        </div>
+    <div class="login-box">
+        <h2>📺 Sistema de Streaming</h2>
+        <div id="message" style="color: red; display: none;"></div>
+        <input type="text" id="username" placeholder="Usuario" value="admin">
+        <input type="password" id="password" placeholder="Contraseña" value="admin123">
+        <button onclick="login()">Entrar</button>
         
-        <div class="message" id="message"></div>
-        
-        <div class="input-group">
-            <label for="username"><i class="fas fa-user"></i> Usuario</label>
-            <input type="text" id="username" placeholder="Ingresa tu usuario">
-        </div>
-        
-        <div class="input-group">
-            <label for="password"><i class="fas fa-key"></i> Contraseña</label>
-            <input type="password" id="password" placeholder="Ingresa tu contraseña">
-        </div>
-        
-        <button class="btn-login" id="loginBtn">
-            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-        </button>
-        
-        <div style="text-align: center; margin-top: 20px; color: #aaa; font-size: 0.9rem;">
-            <p>Sistema seguro con autenticación real</p>
+        <div style="margin-top: 20px; font-size: 12px; color: #aaa;">
+            <p><strong>Usuarios de prueba:</strong></p>
+            <p>• Admin: admin / admin123</p>
+            <p>• Usuario: usuario / cliente123</p>
+            <p>• Invitado: invitado / invitado2024</p>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <script>
-        // Configuración
-        const API_BASE_URL = 'https://tudominio.com/api'; // Cambia por tu dominio
-        
-        // Generar ID del dispositivo
-        function generateDeviceId() {
-            let deviceId = localStorage.getItem('secure_device_id');
-            if (!deviceId) {
-                const navigatorInfo = navigator.userAgent + navigator.language + screen.width + screen.height;
-                const hash = btoa(navigatorInfo).substr(0, 32);
-                deviceId = 'dev_' + Date.now() + '_' + hash;
-                localStorage.setItem('secure_device_id', deviceId);
-            }
-            return deviceId;
-        }
-        
-        // Mostrar mensaje
-        function showMessage(type, text) {
-            const messageEl = document.getElementById('message');
-            messageEl.className = `message ${type}`;
-            messageEl.textContent = text;
-            messageEl.style.display = 'block';
-        }
-        
-        // Login con NocoDB
-        async function login(username, password) {
-            const deviceId = generateDeviceId();
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
             
-            try {
-                const response = await fetch(`${API_BASE_URL}/auth.php?action=login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        username: username,
-                        password: password,
-                        deviceId: deviceId
-                    })
-                });
+            // Mostrar loading
+            document.getElementById('message').style.color = 'yellow';
+            document.getElementById('message').textContent = 'Conectando...';
+            document.getElementById('message').style.display = 'block';
+            
+            // Simular API (en realidad sería a tu backend)
+            setTimeout(() => {
+                // Credenciales válidas
+                const validUsers = {
+                    'admin': { password: 'admin123', type: 'admin' },
+                    'usuario': { password: 'cliente123', type: 'user' },
+                    'invitado': { password: 'invitado2024', type: 'user' }
+                };
                 
-                const data = await response.json();
+                const user = validUsers[username];
                 
-                if (!response.ok) {
-                    throw new Error(data.error || 'Error en la autenticación');
-                }
-                
-                if (!data.success) {
-                    throw new Error(data.error);
-                }
-                
-                // Guardar datos de sesión
-                localStorage.setItem('session_token', data.session.token);
-                localStorage.setItem('user_data', JSON.stringify(data.user));
-                localStorage.setItem('device_id', deviceId);
-                localStorage.setItem('stream_key', data.stream_key || '');
-                
-                // Redirigir según tipo de usuario
-                if (data.user.user_type === 'admin') {
-                    window.location.href = 'admin.html';
-                } else {
-                    window.location.href = 'dashboard.html';
-                }
-                
-            } catch (error) {
-                console.error('Login error:', error);
-                
-                if (error.message.includes('otro dispositivo')) {
-                    showMessage('warning', error.message + '. Por favor, cierra sesión en el otro dispositivo primero.');
-                } else {
-                    showMessage('error', error.message || 'Error en el servidor');
-                }
-            }
-        }
-        
-        // Inicializar
-        document.addEventListener('DOMContentLoaded', () => {
-            // Verificar sesión existente
-            const token = localStorage.getItem('session_token');
-            if (token) {
-                fetch(`${API_BASE_URL}/auth.php?action=verify`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        token: token,
-                        deviceId: generateDeviceId()
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.valid) {
-                        const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
-                        if (userData.user_type === 'admin') {
-                            window.location.href = 'admin.html';
-                        } else {
-                            window.location.href = 'dashboard.html';
-                        }
+                if (user && user.password === password) {
+                    // Guardar sesión
+                    localStorage.setItem('user', username);
+                    localStorage.setItem('isAdmin', user.type === 'admin');
+                    
+                    // Redirigir
+                    if (user.type === 'admin') {
+                        window.location.href = 'admin.html';
+                    } else {
+                        window.location.href = 'dashboard.html';
                     }
-                });
+                } else {
+                    document.getElementById('message').style.color = 'red';
+                    document.getElementById('message').textContent = 'Usuario o contraseña incorrectos';
+                }
+            }, 1000);
+        }
+        
+        // Enter para login
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                login();
             }
-            
-            // Evento login
-            document.getElementById('loginBtn').addEventListener('click', () => {
-                const username = document.getElementById('username').value.trim();
-                const password = document.getElementById('password').value;
-                
-                if (!username || !password) {
-                    showMessage('error', 'Por favor completa todos los campos');
-                    return;
-                }
-                
-                login(username, password);
-            });
-            
-            // Login con Enter
-            document.getElementById('password').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    document.getElementById('loginBtn').click();
-                }
-            });
         });
     </script>
 </body>
