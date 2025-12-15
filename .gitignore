@@ -1,0 +1,15 @@
+# Credenciales
+api/config.php
+api/keys/
+*.env
+
+# Logs
+*.log
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Backend temporal
+/tmp/
+/cache/
